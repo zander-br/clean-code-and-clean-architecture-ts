@@ -9,13 +9,19 @@ export type EnrollStudentRequest = {
 };
 
 export default class EnrollStudent {
+  private readonly enrollments = [];
+
   public execute(enrollStudentRequest: EnrollStudentRequest): void {
     const { student } = enrollStudentRequest;
     if (!student.name.match(/^([A-Za-z]+ )+([A-Za-z])+$/)) {
       throw new Error('Invalid student name');
     }
-
     if (!this.validateCpf(student.cpf)) throw new Error('Invalid student cpf');
+    const enrollment = this.enrollments.find(e => e.student === student);
+    if (enrollment) {
+      throw new Error('Enrollment with duplicated student is not allowed');
+    }
+    this.enrollments.push(enrollStudentRequest);
   }
 
   private validateCpf(str: string) {
