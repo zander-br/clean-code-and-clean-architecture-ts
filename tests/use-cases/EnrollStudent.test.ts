@@ -5,12 +5,25 @@ describe('EnrollStudent', () => {
     const enrollmentRequest = {
       student: {
         name: 'Ana',
+        cpf: '832.081.519-34',
       },
     };
-
     const enrollStudent = new EnrollStudent();
     expect(() => enrollStudent.execute(enrollmentRequest)).toThrow(
       new Error('Invalid student name'),
+    );
+  });
+
+  test('should not enroll without valid student cpf', () => {
+    const enrollmentRequest = {
+      student: {
+        name: 'Ana Silva',
+        cpf: '123.456.789-99',
+      },
+    };
+    const enrollStudent = new EnrollStudent();
+    expect(() => enrollStudent.execute(enrollmentRequest)).toThrow(
+      new Error('Invalid student cpf'),
     );
   });
 });
