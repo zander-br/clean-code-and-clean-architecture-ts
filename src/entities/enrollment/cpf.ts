@@ -1,57 +1,60 @@
-/* eslint-disable no-param-reassign */
+const FACTOR_DIGIT_1 = 10;
+const FACTOR_DIGIT_2 = 11;
+const MAX_DIGITS_1 = 9;
+const MAX_DIGITS_2 = 10;
+
 export default class Cpf {
   private constructor(private readonly cpf: string) {
     Object.freeze(this);
   }
 
-  public static validate(str: string): boolean {
-    if (str !== null && str !== undefined) {
-      if (str.length >= 11 || str.length <= 14) {
-        str = str.replace('.', '');
-        str = str.replace('.', '');
-        str = str.replace('-', '');
-        str = str.replace(' ', '');
-        if (!str.split('').every(c => c === str[0])) {
-          try {
-            let d1;
-            let d2;
-            let digito1;
-            let digito2;
-            let resto;
-            let digito;
-            let nDigResult;
-            // eslint-disable-next-line no-multi-assign
-            d1 = d2 = 0;
-            // eslint-disable-next-line no-multi-assign
-            digito1 = digito2 = resto = 0;
+  public static create(cpf: string): Cpf {
+    if (!this.validate(cpf)) throw new Error('Invalid student cpf');
+    const onlyDigits = this.extractDigits(cpf);
+    return new Cpf(onlyDigits);
+  }
 
-            for (let nCount = 1; nCount < str.length - 1; nCount++) {
-              digito = parseInt(str.substring(nCount - 1, nCount), 10);
-              d1 += (11 - nCount) * digito;
-              d2 += (12 - nCount) * digito;
-            }
+  get value(): string {
+    return this.cpf;
+  }
 
-            resto = d1 % 11;
+  public static validate(cpf = ''): boolean {
+    const cpfDigits = this.extractDigits(cpf);
+    if (this.isInvalidLength(cpfDigits)) return false;
+    if (this.isBlocked(cpfDigits)) return false;
+    const digit1 = this.calculateDigit(cpfDigits, FACTOR_DIGIT_1, MAX_DIGITS_1);
+    const digit2 = this.calculateDigit(cpfDigits, FACTOR_DIGIT_2, MAX_DIGITS_2);
+    const calculateCheckDigit = `${digit1}${digit2}`;
+    return this.getCheckDigit(cpfDigits) === calculateCheckDigit;
+  }
 
-            digito1 = resto < 2 ? (digito1 = 0) : 11 - resto;
+  private static extractDigits(cpf: string) {
+    return cpf.replace(/\D/g, '');
+  }
 
-            d2 += 2 * digito1;
+  private static isInvalidLength(cpf: string) {
+    return cpf.length !== 11;
+  }
 
-            resto = d2 % 11;
+  private static isBlocked(cpf: string) {
+    const [firstDigit] = cpf;
+    return cpf.split('').every(digit => digit === firstDigit);
+  }
 
-            if (resto < 2) digito2 = 0;
-            else digito2 = 11 - resto;
+  private static calculateDigit(cpf: string, factor: number, max: number) {
+    let calculateFactor = factor;
+    let total = 0;
+    for (const digit of this.toDigitArray(cpf).slice(0, max)) {
+      total += digit * calculateFactor--;
+    }
+    return total % 11 < 2 ? 0 : 11 - (total % 11);
+  }
 
-            const nDigVerific = str.substring(str.length - 2, str.length);
-            // eslint-disable-next-line prefer-const
-            nDigResult = `${digito1}${digito2}`;
-            // eslint-disable-next-line eqeqeq
-            return nDigVerific == nDigResult;
-          } catch (e) {
-            return false;
-          }
-        } else return false;
-      } else return false;
-    } else return false;
+  private static toDigitArray(cpf: string) {
+    return [...cpf].map(digit => parseInt(digit, 10));
+  }
+
+  private static getCheckDigit(cpf: string) {
+    return cpf.slice(9);
   }
 }
