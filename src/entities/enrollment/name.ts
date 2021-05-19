@@ -8,6 +8,10 @@ export default class Name {
     return new Name(name);
   }
 
+  get value(): string {
+    return this.name;
+  }
+
   static validate(name: string): boolean {
     return !!name.match(/^([A-Za-z]+ )+([A-Za-z])+$/);
   }
