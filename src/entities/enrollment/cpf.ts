@@ -18,6 +18,11 @@ export default class Cpf {
     return this.cpf;
   }
 
+  public isEqual(cpf = ''): boolean {
+    const onlyDigits = Cpf.extractDigits(cpf);
+    return this.cpf === onlyDigits;
+  }
+
   public static validate(cpf = ''): boolean {
     const cpfDigits = this.extractDigits(cpf);
     if (this.isInvalidLength(cpfDigits)) return false;
