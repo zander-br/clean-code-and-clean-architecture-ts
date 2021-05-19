@@ -1,6 +1,10 @@
 import Cpf from '@/entities/enrollment/cpf';
 
 describe('CPF object value', () => {
+  test('should return false when call validate with CPF empty', () => {
+    expect(Cpf.validate('')).toBe(false);
+  });
+
   test('should return false when call validate with CPF have equal numbers', () => {
     const cpf = '00000000000';
     expect(Cpf.validate(cpf)).toBe(false);
